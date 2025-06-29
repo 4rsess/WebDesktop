@@ -6,10 +6,12 @@ const pcDetails = document.getElementById('pc-details');
 let currentBranchId = null;
 let selectedPcId = null;
 let computers = [];
+let selectedX = null;
+let selectedY = null;
 let authToken = localStorage.getItem('authToken');
 
 if (!authToken) {
-  window.location.href = '../login/Login.html';
+  window.location.href = '/login/Login.html';
   alert("Токен авторизации отсутствует");
 }
 
@@ -110,10 +112,10 @@ function renderGrid(branchId, width, height) {
             }
             break;
           case 'OCCUPIED':
-            statusClass = 'lBusy';
+            statusClass = 'lBooked';
             break;
           case 'OUT_OF_SERVICE':
-            statusClass = 'lEmpty';
+            statusClass = 'lBusy';
             break;
           default:
             statusClass = 'lDefault';
@@ -135,7 +137,8 @@ function renderGrid(branchId, width, height) {
         div.onclick = () => handlePcClick(pc.id);
       } else {
         div.className = 'computer-cell lEmpty';
-        div.textContent = '-';
+        div.innerHTML = '<div class="cell-add">+</div>';
+        div.onclick = () => handleEmptyCellClick(x, y);
       }
       
       grid.appendChild(div);
@@ -146,8 +149,6 @@ function renderGrid(branchId, width, height) {
 function getPriceByLevel(priceLevel) {
   switch (priceLevel) {
     case 'VIP': return 500;
-    case 'EXTRA': return 300;
-    case 'STANDARD': return 200;
     default: return 150;
   }
 }
@@ -163,6 +164,153 @@ function handlePcClick(pcId) {
   loadPcDetails(pcId);
 }
 
+function handleEmptyCellClick(x, y) {
+  selectedX = x;
+  selectedY = y;
+  renderAddPcForm();
+}
+
+function renderAddPcForm() {
+  pcDetails.innerHTML = `
+    <h3>Добавить новый ПК</h3>
+    <div class="pc-specs">
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">ID ПК</span>
+        <input type="number" id="pc-id" class="pc-spec-input" placeholder="Введите ID">
+      </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">Процессор</span>
+        <input type="text" id="pc-processor" class="pc-spec-input" placeholder="Введите процессор">
+      </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">Видеокарта</span>
+        <input type="text" id="pc-gpu" class="pc-spec-input" placeholder="Введите видеокарту">
+      </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">Материнская плата</span>
+        <input type="text" id="pc-motherboard" class="pc-spec-input" placeholder="Введите материнскую плату">
+      </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">Оперативная память</span>
+        <input type="text" id="pc-ram" class="pc-spec-input" placeholder="Введите оперативную память">
+      </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">Накопитель</span>
+        <input type="text" id="pc-disk" class="pc-spec-input" placeholder="Введите накопитель">
+      </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">Доступные игры</span>
+        <input type="text" id="pc-games" class="pc-spec-input" placeholder="Введите доступные игры">
+      </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">Монитор (Hz)</span>
+        <input type="number" id="pc-monitor" class="pc-spec-input" placeholder="Введите частоту монитора">
+      </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">Статус</span>
+        <select id="pc-status" class="pc-spec-select">
+          <option value="AVAILABLE">Доступен</option>
+          <option value="OCCUPIED">Занят</option>
+          <option value="OUT_OF_SERVICE">Не обслуживается</option>
+        </select>
+      </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">Уровень цены</span>
+        <select id="pc-price-level" class="pc-spec-select">
+          <option value="DEFAULT">Обычный (150 ₽/час)</option>
+          <option value="VIP">VIP (500 ₽/час)</option>
+        </select>
+      </div>
+    </div>
+    <button id="add-pc-button" class="book-button inactive" disabled>Добавить ПК</button>
+  `;
+
+  const inputs = pcDetails.querySelectorAll('.pc-spec-input');
+  inputs.forEach(input => {
+    input.addEventListener('input', checkFormCompletion);
+  });
+
+  pcDetails.classList.add('active');
+}
+
+function checkFormCompletion() {
+  const id = document.getElementById('pc-id').value;
+  const processor = document.getElementById('pc-processor').value;
+  const gpu = document.getElementById('pc-gpu').value;
+  const motherboard = document.getElementById('pc-motherboard').value;
+  const ram = document.getElementById('pc-ram').value;
+  const disk = document.getElementById('pc-disk').value;
+  const games = document.getElementById('pc-games').value;
+  const monitor = document.getElementById('pc-monitor').value;
+
+  const addButton = document.getElementById('add-pc-button');
+  
+  if (id && processor && gpu && motherboard && ram && disk && games && monitor) {
+    addButton.classList.remove('inactive');
+    addButton.classList.add('active');
+    addButton.disabled = false;
+    addButton.onclick = addNewPc;
+  } else {
+    addButton.classList.add('inactive');
+    addButton.classList.remove('active');
+    addButton.disabled = true;
+  }
+}
+
+async function addNewPc() {
+  const id = document.getElementById('pc-id').value;
+  const processor = document.getElementById('pc-processor').value;
+  const gpu = document.getElementById('pc-gpu').value;
+  const motherboard = document.getElementById('pc-motherboard').value;
+  const ram = document.getElementById('pc-ram').value;
+  const disk = document.getElementById('pc-disk').value;
+  const games = document.getElementById('pc-games').value;
+  const monitor = document.getElementById('pc-monitor').value;
+  const status = document.getElementById('pc-status').value;
+  const priceLevel = document.getElementById('pc-price-level').value;
+
+  if (!confirm('Вы уверены, что хотите добавить этот ПК?')) return;
+
+  const pcData = {
+    id: parseInt(id),
+    processor,
+    gpu,
+    motherboard,
+    ram,
+    disk,
+    gamesInstalled: games,
+    monitorHz: parseInt(monitor),
+    status,
+    branchId: currentBranchId,
+    x: selectedX,
+    y: selectedY,
+    priceLevel,
+    endTime: null
+  };
+
+  try {
+    const response = await fetch('http://5.129.207.193:8080/admin/pcs', {
+      method: 'POST',
+      headers: {
+        'accept': '*/*',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify(pcData)
+    });
+
+    if (!response.ok) throw new Error('Ошибка при добавлении ПК');
+
+    alert('ПК успешно добавлен');
+    loadBranchComputers(currentBranchId, grid.style.gridTemplateColumns.split(' ').length, grid.children.length / grid.style.gridTemplateColumns.split(' ').length);
+    pcDetails.classList.remove('active');
+    location.reload();
+  } catch (error) {
+    console.error('Ошибка:', error);
+    alert('Ошибка при добавлении ПК');
+  }
+}
+
 async function loadPcDetails(pcId) {
   try {
     const response = await fetch(`http://5.129.207.193:8080/branches/${currentBranchId}/pcs/${pcId}`, {
@@ -175,7 +323,7 @@ async function loadPcDetails(pcId) {
     if (!response.ok) throw new Error('Ошибка загрузки данных ПК');
     
     const details = await response.json();
-    renderPcDetails(details);
+    renderPcDetailsAdmin(details);
     
   } catch (error) {
     console.error('Ошибка:', error);
@@ -184,65 +332,151 @@ async function loadPcDetails(pcId) {
   }
 }
 
-function renderPcDetails(details) {
-  const endTime = details.endTime ? new Date(details.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
-  const isAvailable = details.status === 'AVAILABLE';
-  const price = getPriceByLevel(details.priceLevel);
-
-  let html = `
-    <h3>ПК ${details.id} - Характеристики</h3>
+function renderPcDetailsAdmin(details) {
+  pcDetails.innerHTML = `
+    <h3>ПК ${details.id} - Редактирование</h3>
     <div class="pc-specs">
       <div class="pc-spec-item">
+        <span class="pc-spec-label">ID ПК</span>
+        <input type="text" id="pc-id" class="pc-spec-input" value="${details.id}" readonly>
+      </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">ID филиала</span>
+        <input type="text" id="pc-branch-id" class="pc-spec-input" value="${details.branchId}" readonly>
+      </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">Позиция X</span>
+        <input type="text" id="pc-x" class="pc-spec-input" value="${details.x}" readonly>
+      </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">Позиция Y</span>
+        <input type="text" id="pc-y" class="pc-spec-input" value="${details.y}" readonly>
+      </div>
+      <div class="pc-spec-item">
         <span class="pc-spec-label">Процессор</span>
-        <span class="pc-spec-value">${details.processor}</span>
+        <input type="text" id="pc-processor" class="pc-spec-input" value="${details.processor}">
       </div>
       <div class="pc-spec-item">
         <span class="pc-spec-label">Видеокарта</span>
-        <span class="pc-spec-value">${details.gpu}</span>
+        <input type="text" id="pc-gpu" class="pc-spec-input" value="${details.gpu}">
       </div>
       <div class="pc-spec-item">
         <span class="pc-spec-label">Материнская плата</span>
-        <span class="pc-spec-value">${details.motherboard}</span>
+        <input type="text" id="pc-motherboard" class="pc-spec-input" value="${details.motherboard}">
       </div>
       <div class="pc-spec-item">
         <span class="pc-spec-label">Оперативная память</span>
-        <span class="pc-spec-value">${details.ram}</span>
+        <input type="text" id="pc-ram" class="pc-spec-input" value="${details.ram}">
       </div>
       <div class="pc-spec-item">
         <span class="pc-spec-label">Накопитель</span>
-        <span class="pc-spec-value">${details.disk}</span>
+        <input type="text" id="pc-disk" class="pc-spec-input" value="${details.disk}">
       </div>
       <div class="pc-spec-item">
         <span class="pc-spec-label">Доступные игры</span>
-        <span class="pc-spec-value">${details.gamesInstalled}</span>
+        <input type="text" id="pc-games" class="pc-spec-input" value="${details.gamesInstalled}">
       </div>
       <div class="pc-spec-item">
-        <span class="pc-spec-label">Монитор</span>
-        <span class="pc-spec-value">${details.monitorHz}Hz</span>
+        <span class="pc-spec-label">Монитор (Hz)</span>
+        <input type="number" id="pc-monitor" class="pc-spec-input" value="${details.monitorHz}">
       </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">Статус</span>
+        <select id="pc-status" class="pc-spec-select">
+          <option value="AVAILABLE" ${details.status === 'AVAILABLE' ? 'selected' : ''}>Доступен</option>
+          <option value="OCCUPIED" ${details.status === 'OCCUPIED' ? 'selected' : ''}>Занят</option>
+          <option value="OUT_OF_SERVICE" ${details.status === 'OUT_OF_SERVICE' ? 'selected' : ''}>Не обслуживается</option>
+        </select>
+      </div>
+      <div class="pc-spec-item">
+        <span class="pc-spec-label">Уровень цены</span>
+        <select id="pc-price-level" class="pc-spec-select">
+          <option value="DEFAULT" ${details.priceLevel === 'DEFAULT' ? 'selected' : ''}>Обычный (150 ₽/час)</option>
+          <option value="VIP" ${details.priceLevel === 'VIP' ? 'selected' : ''}>VIP (500 ₽/час)</option>
+        </select>
+      </div>
+    </div>
+    <div class="admin-buttons">
+      <button id="edit-pc-button" class="edit-button">Редактировать ПК</button>
+      <button id="delete-pc-button" class="delete-button">Удалить ПК</button>
     </div>
   `;
 
-  if (isAvailable) {
-    html += `<button class="book-button active">Забронировать (${price} ₽/час)</button>`;
-  } else if (details.status === 'OCCUPIED' && endTime) {
-    html += `<button class="book-button inactive" disabled>
-              Занят до ${endTime}
-            </button>`;
-  } else {
-    html += `<button class="book-button inactive" disabled>
-              Недоступен для бронирования
-            </button>`;
-  }
-
-  pcDetails.innerHTML = html;
   pcDetails.classList.add('active');
 
-  const bookButton = pcDetails.querySelector('.book-button.active');
-  if (bookButton) {
-    bookButton.onclick = () => {
-      window.location.href = `http://127.0.0.1:3000/bookingDetails/BookingDetails.html?pcId=${details.id}&price=${price}`;
-    };
+  document.getElementById('edit-pc-button').onclick = () => updatePc(details.id);
+  document.getElementById('delete-pc-button').onclick = () => deletePc(details.id);
+}
+
+async function updatePc(pcId) {
+  const processor = document.getElementById('pc-processor').value;
+  const gpu = document.getElementById('pc-gpu').value;
+  const motherboard = document.getElementById('pc-motherboard').value;
+  const ram = document.getElementById('pc-ram').value;
+  const disk = document.getElementById('pc-disk').value;
+  const games = document.getElementById('pc-games').value;
+  const monitor = document.getElementById('pc-monitor').value;
+  const status = document.getElementById('pc-status').value;
+  const priceLevel = document.getElementById('pc-price-level').value;
+
+  if (!confirm('Вы уверены, что хотите обновить данные этого ПК?')) return;
+
+  const pcData = {
+    processor,
+    gpu,
+    motherboard,
+    ram,
+    disk,
+    gamesInstalled: games,
+    monitorHz: parseInt(monitor),
+    status,
+    priceLevel
+  };
+
+  try {
+    const response = await fetch(`http://5.129.207.193:8080/admin/pcs/${pcId}`, {
+      method: 'PUT',
+      headers: {
+        'accept': '*/*',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify(pcData)
+    });
+
+    if (!response.ok) throw new Error('Ошибка при обновлении ПК');
+
+    alert('ПК успешно обновлен');
+    loadBranchComputers(currentBranchId, grid.style.gridTemplateColumns.split(' ').length, grid.children.length / grid.style.gridTemplateColumns.split(' ').length);
+    pcDetails.classList.remove('active');
+    location.reload();
+  } catch (error) {
+    console.error('Ошибка:', error);
+    alert('Ошибка при обновлении ПК');
+  }
+}
+
+async function deletePc(pcId) {
+  if (!confirm('Вы уверены, что хотите удалить этот ПК?')) return;
+
+  try {
+    const response = await fetch(`http://5.129.207.193:8080/admin/pcs/${pcId}`, {
+      method: 'DELETE',
+      headers: {
+        'accept': '*/*',
+        'Authorization': `Bearer ${authToken}`
+      }
+    });
+
+    if (!response.ok) throw new Error('Ошибка при удалении ПК');
+
+    alert('ПК успешно удален');
+    loadBranchComputers(currentBranchId, grid.style.gridTemplateColumns.split(' ').length, grid.children.length / grid.style.gridTemplateColumns.split(' ').length);
+    pcDetails.classList.remove('active');
+    location.reload();
+  } catch (error) {
+    console.error('Ошибка:', error);
+    alert('Ошибка при удалении ПК');
   }
 }
 
