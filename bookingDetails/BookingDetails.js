@@ -1,3 +1,8 @@
+document.getElementById('logout-link').addEventListener('click', function (event) {
+    event.preventDefault();
+    localStorage.clear();
+    window.location.href = '../login/Login.html'; 
+  });
 document.addEventListener('DOMContentLoaded', function() {
     const authToken = localStorage.getItem('authToken');
     if (!authToken) {

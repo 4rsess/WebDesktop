@@ -13,8 +13,10 @@
     <nav class="nav">
       <div class="nav-container">
         <a id="login-btn" class="login-btn" href="../login/Login.html">Войти</a>
-        <a href="../booking/Booking.html">Бронирование</a>
+        <a id="booking-btn" href="../booking/Booking.html">Бронирование</a>
         <a id="profile-link" href="../profile/Profile.html">Личный кабинет</a>
+        <a href="../users/Users.html">Пользователи</a>
+        <a href="#" id="logout-link">Выйти</a>
       </div>
     </nav>
   </header>
@@ -27,6 +29,57 @@
       <div class="dots"></div>
     </div>
   </main>
+
+  <div class="create">
+    <button class="create-promo-btn" id="create-promo-btn">Создать акцию</button>
+  </div>
+
+  <div id="promo-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2>Акция</h2>
+      <form id="promo-form">
+        <label>Тип акции:
+          <select name="type" required>
+            <option value="PERCENT">PERCENT</option>
+            <option value="FIXED_AMOUNT">FIXED_AMOUNT</option>
+          </select>
+        </label><br>
+
+        <label>Размер скидки:
+          <input type="number" name="promotionValue" required>
+        </label><br>
+
+        <label>Описание:
+          <input type="text" name="description" required>
+        </label><br>
+
+        <label>Дата начала:
+          <input type="date" name="startDate" required>
+        </label><br>
+
+        <label>Дата окончания:
+          <input type="date" name="endDate" required>
+        </label><br>
+
+        <label>Платформа:
+          <select name="platformFor" required>
+            <option value="PC">PC</option>
+            <option value="VR">VR</option>
+          </select>
+        </label><br>
+
+        <label>Картинка:
+          <input type="file" id="promo-image-input" accept="image/*" required>
+        </label><br>
+
+        <input type="hidden" name="imageId" id="image-id-field">
+
+        <button class="saveBtn" type="submit">Сохранить</button>
+        <button class="saveBtn" type="button" id="cancel-btn">Отменить</button>
+      </form>
+    </div>
+  </div>
+
 
   <footer>
     <div class="footer-left">

@@ -3,6 +3,12 @@ let profileData = {};
 let bookingsData = [];
 let branchesData = [];
 
+document.getElementById('logout-link').addEventListener('click', function (event) {
+    event.preventDefault();
+    localStorage.clear();
+    window.location.href = '../login/Login.html'; 
+  });
+
 if (!authToken) {
   window.location.href = '/login/Login.html';
 }

@@ -2,6 +2,7 @@ const branchSelector = document.querySelector('.branch-selector');
 const selectedBranch = document.getElementById('selected-branch');
 const branchOptions = document.getElementById('branch-options');
 const grid = document.getElementById('computer-grid');
+const bookingsContainer = document.getElementById('bookings-table');
 const pcDetails = document.getElementById('pc-details');
 let currentBranchId = null;
 let selectedPcId = null;
@@ -10,8 +11,14 @@ let selectedX = null;
 let selectedY = null;
 let authToken = localStorage.getItem('authToken');
 
+document.getElementById('logout-link').addEventListener('click', function (event) {
+    event.preventDefault();
+    localStorage.clear();
+    window.location.href = '../login/Login.html'; 
+  });
+
 if (!authToken) {
-  window.location.href = '/login/Login.html';
+  window.location.href = '../login/Login.html';
   alert("Токен авторизации отсутствует");
 }
 
@@ -47,6 +54,7 @@ async function loadBranches() {
     selectedBranch.querySelector('span').textContent = branches[0].name;
     currentBranchId = branches[0].id;
     loadBranchComputers(branches[0].id, branches[0].width, branches[0].height);
+    loadBookings();
     
   } catch (error) {
     console.error('Ошибка:', error);
@@ -479,5 +487,120 @@ async function deletePc(pcId) {
     alert('Ошибка при удалении ПК');
   }
 }
+
+
+async function loadBookings() {
+  try {
+    const response = await fetch('http://5.129.207.193:8080/bookings/all', {
+      headers: {
+        'accept': '*/*',
+        'Authorization': `Bearer ${authToken}`
+      }
+    });
+    
+    if (!response.ok) throw new Error('Ошибка загрузки бронирований');
+    
+    const bookings = await response.json();
+    renderBookingsTable(bookings);
+    
+  } catch (error) {
+    console.error('Ошибка:', error);
+    bookingsContainer.innerHTML = '<p>Ошибка загрузки данных бронирований</p>';
+  }
+}
+
+function renderBookingsTable(bookings) {
+  bookingsContainer.innerHTML = `
+    <div class="bookings-container">
+      <h3>Активные бронирования</h3>
+      <div class="bookings-scroll">
+        ${bookings.map(booking => `
+          <div class="booking-card">
+            <div class="booking-field">
+              <span class="booking-label">ID брони:</span>
+              <span class="booking-value">${booking.id}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-label">Имя:</span>
+              <span class="booking-value">${booking.firstName}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-label">Фамилия:</span>
+              <span class="booking-value">${booking.lastName}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-label">Телефон:</span>
+              <span class="booking-value">${booking.phone}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-label">Email:</span>
+              <span class="booking-value">${booking.email}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-label">ID ПК:</span>
+              <span class="booking-value">${booking.pcId}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-label">Начало:</span>
+              <span class="booking-value">${new Date(booking.startTime).toLocaleString()}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-label">Конец:</span>
+              <span class="booking-value">${new Date(booking.endTime).toLocaleString()}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-label">Метод оплаты:</span>
+              <span class="booking-value">${booking.paymentMethod === 'QR_ONLINE' ? 'QR онлайн' : booking.paymentMethod}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-label">Итоговая цена:</span>
+              <span class="booking-value">${booking.finalPrice} ₽</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-label">ID подтверждения QR:</span>
+              <span class="booking-value">${booking.qrConfirmationId}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-label">ID платежа QR:</span>
+              <span class="booking-value">${booking.qrPaymentId}</span>
+            </div>
+            <button class="cancel-booking-btn" data-booking-id="${booking.id}">Отменить бронь</button>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll('.cancel-booking-btn').forEach(button => {
+    button.addEventListener('click', async (e) => {
+      const bookingId = e.target.getAttribute('data-booking-id');
+      const confirmCancel = confirm('Вы уверены, что хотите отменить бронирование?');
+      
+      if (confirmCancel) {
+        try {
+          const authToken = localStorage.getItem('authToken');
+          const response = await fetch(`http://5.129.207.193:8080/bookings/${bookingId}/cancel`, {
+            method: 'DELETE',
+            headers: {
+              'accept': '*/*',
+              'Authorization': `Bearer ${authToken}`
+            }
+          });
+          
+          if (response.ok) {
+            alert('Бронирование успешно отменено');
+            loadBranches();
+          } else {
+            alert('Ошибка при отмене бронирования');
+          }
+        } catch (error) {
+          console.error('Ошибка:', error);
+          alert('Произошла ошибка при отмене бронирования');
+        }
+      }
+    });
+  });
+}
+
 
 loadBranches();
