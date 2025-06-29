@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Карта залов</title>
+  <link rel="stylesheet" href="Booking.css">
+</head>
+<body>
+  <header>
+    <div class="logo"><img src="../pictures/logo.png" alt="Logo"></div>
+    <nav class="nav">
+      <a href="../main/Main.html">Главная</a>
+      <a href="../profile/Profile.html">Личный кабинет</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="branch-selector">
+      <div class="selected-branch" id="selected-branch">
+        <span>Выберите филиал</span>
+        <img src="../pictures/arrow.svg" alt="▲" class="arrow">
+      </div>
+      <div class="branch-options" id="branch-options"></div>
+    </div>
+    <div class="grid-container" id="computer-grid"></div>
+    <div class="pc-details" id="pc-details"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-box lDefault"></div> 150₽</div>
+      <div class="legend-item"><div class="legend-box lVIP"></div> 500₽</div>
+      <div class="legend-item"><div class="legend-box lBusy"></div> Занят</div>
+      <div class="legend-item"><div class="legend-box lBooked"></div> Забронирован</div>
+      <div class="legend-item"><div class="legend-box lEmpty"></div> Нет ПК</div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-left">
+      <img src="../pictures/social/x.svg" alt="x icon">
+      <img src="../pictures/social/insta.svg" alt="insta">
+      <img src="../pictures/social/youtube.svg" alt="yt">
+    </div>
+    <div class="footer-center">
+      <p>© 2024 AntiTouching Grass Club. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="Booking.js"></script>
+</body>
+</html>

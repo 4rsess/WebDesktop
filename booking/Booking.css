@@ -1,0 +1,249 @@
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
+body {
+  min-height: 100vh;
+  background: linear-gradient(#000, #002400);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 40px;
+  background: linear-gradient(to bottom, #111, #000);
+}
+.logo img { height: 50px; }
+.nav a {
+  margin-left: 30px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
+.nav a:hover { color: #00ff66; }
+
+main {
+  flex: 1;
+  padding: 30px 20px;
+  width: 90%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.slider {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  margin-bottom: 30px;
+  padding-bottom: 8px;
+}
+.slider button {
+  flex: 0 0 auto;
+  padding: 8px 20px;
+  border: none;
+  background: #444;
+  color: #fff;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.slider button.active,
+.slider button:hover { background: #00ff66; color: #000; }
+
+.grid-container {
+  display: grid;
+  gap: 6px;
+  background: rgba(255,255,255,0.1);
+  padding: 16px;
+  border-radius: 12px;
+  justify-content: center;
+}
+.computer-cell {
+  position: relative;
+  width: 60px; height: 60px;
+  background: #333;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #fff;
+  font-size: 12px;
+  padding: 4px;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+.computer-cell:hover { transform: scale(1.05); z-index: 1; }
+.cell-number { font-weight: bold; align-self: flex-start; }
+.cell-time { font-size: 11px; align-self: flex-end; }
+
+.empty { background: #666; display: flex; justify-content: center; align-items: center; }
+.busy { background: #e74c3c; }
+.booked { background: #f39c12; color: #000; }
+.available-100 { background: #81c784; }
+.available-150 { background: #4caf50; }
+.available-200 { background: #2e7d32; }
+
+.legend {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.legend-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.lDefault { background: #4caf50; }
+.lVIP { background: #2e7d32; }
+.lBusy { background: #e74c3c; }
+.lBooked { background: #f39c12; }
+.lEmpty { background: #666; }
+
+footer {
+  background: #1f4e1f;
+  padding: 10px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-left img {
+  width: 20px; height: 20px;
+  margin-right: 10px;
+  filter: brightness(0) invert(1);
+}
+.footer-center p {
+  font-size: 0.8rem;
+  color: #ccc;
+}
+.branch-selector {
+  position: relative;
+  width: 300px;
+  margin-bottom: 30px;
+}
+
+.selected-branch {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.selected-branch:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.selected-branch .arrow {
+  width: 12px;
+  height: 12px;
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+.branch-selector.active .selected-branch .arrow {
+  transform: rotate(360deg);
+}
+
+.branch-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background:black;
+  border-radius: 0 0 8px 8px;
+  border-bottom: 1px solid white;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  z-index: 10;
+}
+
+.branch-selector.active .branch-options {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.branch-option {
+  padding: 12px 20px;
+  cursor: pointer;
+}
+
+.branch-option:hover {
+  background: rgba(0, 255, 102, 0.2);
+  color: #00ff66;
+}
+
+.branch-option:not(:last-child) {
+  border-bottom: 1px solid #444;
+}
+
+.pc-details {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  display: none;
+}
+
+.pc-details.active {
+  display: block;
+}
+
+.pc-details h3 {
+  margin-bottom: 15px;
+  color: #00ff66;
+}
+
+.pc-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.pc-spec-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.pc-spec-label {
+  font-size: 12px;
+  color: #ccc;
+}
+
+.pc-spec-value {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.book-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+}
+
+.book-button.active {
+  background: #00ff66;
+  color: #000;
+}
+
+.book-button.active:hover {
+  background: #00cc55;
+}
+
+.book-button.inactive {
+  background: #666;
+  color: #ccc;
+  cursor: not-allowed;
+}

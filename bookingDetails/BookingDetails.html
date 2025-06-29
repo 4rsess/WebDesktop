@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронирование - CyberCore</title>
+    <link rel="stylesheet" href="BookingDetails.css">
+</head>
+<body>
+    <header>
+        <div class="logo"><img src="../pictures/logo.png" alt="CyberCore"></div>
+        <nav class="nav">
+            <a href="../main/Main.html">Главная</a>
+            <a href="../profile/Profile.html">Личный кабинет</a>
+        </nav>
+    </header>
+
+    <main class="main">
+        <div class="booking-container">
+            <h1>Бронирование компьютера</h1>
+            
+            <div class="booking-steps">
+                <div class="booking-step active" id="step-date">
+                    <h2>Выберите дату бронирования</h2>
+                    <input type="date" id="booking-date" class="date-input">
+                    <div class="btn-container">
+                        <button id="check-date-btn" class="btn btn--primary">Проверить доступность</button>
+                    </div>
+                </div>
+                
+                <div class="booking-step" id="step-time">
+                    <h2>Выберите время бронирования</h2>
+                    <div class="time-slots-container">
+                        <div class="available-slots" id="available-slots"></div>
+                        <div class="time-range-selector">
+                            <div class="time-range-inputs">
+                                <div class="time-input">
+                                    <label for="start-time">Начало:</label>
+                                    <select id="start-time" disabled></select>
+                                </div>
+                                <div class="time-input">
+                                    <label for="end-time">Конец:</label>
+                                    <select id="end-time" disabled></select>
+                                </div>
+                            </div>
+                            <div class="time-slider-container">
+                                <input type="range" id="time-slider" min="1" max="12" value="1" step="1" disabled class="time-slider">
+                                <div class="slider-ticks" id="slider-ticks"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-container">
+                        <button id="confirm-time-btn" class="btn btn--primary" disabled>Подтвердить время</button>
+                    </div>
+                </div>
+                
+                <div class="booking-step" id="step-promo">
+                    <h2>Применение скидки</h2>
+                    <div class="promotions-list" id="promotions-list"></div>
+                    <div class="price-summary">
+                        <div class="price-row">
+                            <span>Стоимость:</span>
+                            <span id="base-price">0 руб.</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Скидка:</span>
+                            <span id="discount-value">0 руб.</span>
+                        </div>
+                        <div class="price-row total">
+                            <span>Итого:</span>
+                            <span id="final-price">0 руб.</span>
+                        </div>
+                    </div>
+                    <div class="btn-container">
+                        <button id="confirm-promo-btn" class="btn btn--primary">Продолжить без скидки</button>
+                    </div>
+                </div>
+                
+                <div class="booking-step" id="step-payment">
+                    <h2>Выберите способ оплаты</h2>
+                    <div class="payment-methods">
+                        <div class="payment-method" data-method="QR_ONLINE">
+                            <input type="radio" name="payment" id="payment-online" checked>
+                            <label for="payment-online">
+                                <span class="payment-icon">💳</span>
+                                <span class="payment-title">Онлайн оплата</span>
+                                <span class="payment-desc">Оплата через QR-код онлайн</span>
+                            </label>
+                        </div>
+                        <div class="payment-method" data-method="QR_OFFLINE">
+                            <input type="radio" name="payment" id="payment-offline">
+                            <label for="payment-offline">
+                                <span class="payment-icon">🏦</span>
+                                <span class="payment-title">Офлайн оплата</span>
+                                <span class="payment-desc">Оплата через QR-код на месте</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="btn-container">
+                        <button id="confirm-payment-btn" class="btn btn--primary">Подтвердить бронирование</button>
+                    </div>
+                </div>
+                
+                <div class="booking-step" id="step-confirm">
+                    <h2>Подтверждение бронирования</h2>
+                    <div class="booking-summary">
+                        <div class="summary-row">
+                            <span>Компьютер:</span>
+                            <span id="summary-pc">ПК 1</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Дата:</span>
+                            <span id="summary-date">28.06.2025</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Время:</span>
+                            <span id="summary-time">15:00 - 17:00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Стоимость:</span>
+                            <span id="summary-price">300 руб.</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Способ оплаты:</span>
+                            <span id="summary-payment">Онлайн</span>
+                        </div>
+                    </div>
+                    <div class="btn-container">
+                        <button id="final-confirm-btn" class="btn btn--primary">Подтвердить и оплатить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-left">
+            <img src="../pictures/social/x.svg" alt="x icon">
+            <img src="../pictures/social/insta.svg" alt="insta">
+            <img src="../pictures/social/youtube.svg" alt="yt">
+        </div>
+        <div class="footer-center">
+            <p>© 2025 AntiTouching Grass Club. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="BookingDetails.js"></script>
+</body>
+</html>
